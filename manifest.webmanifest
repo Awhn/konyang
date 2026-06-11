@@ -1,7 +1,7 @@
 {
-  "name": "KOEN 코냥이 경주 복불복",
+  "name": "코냥이 경주 복불복 게임",
   "short_name": "코냥이 경주",
-  "description": "KOEN 코냥이들이 달리는 모바일 경주 복불복 게임",
+  "description": "코냥이들이 달리는 모바일 경주 복불복 게임",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",
@@ -10,16 +10,10 @@
   "orientation": "landscape",
   "icons": [
     {
-      "src": "./icon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
+      "src": "./icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "./icon-maskable.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ]
 }
