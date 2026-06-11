@@ -10,6 +10,9 @@
 <title>KOEN 코냥이 경주 복불복</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
   
 <style>
   :root{
@@ -501,6 +504,12 @@ document.getElementById('startBtn').onclick = async () => {
 });
 document.getElementById('againBtn').onclick=startRace;
 document.getElementById('homeBtn').onclick=()=>{cancelAnimationFrame(rafId);clearInterval(tickId);show('setup');};
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
