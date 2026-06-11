@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d2138">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>KOEN 코냥이 경주 복불복</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  
 <style>
   :root{
     --sky-top:#7ec8f7; --sky-bot:#bfe9ff;
@@ -355,6 +360,17 @@ function buildLanes(){
   }
 }
 
+async function enterFullscreen(){
+  const el = document.documentElement;
+  try{
+    if(el.requestFullscreen){
+      await el.requestFullscreen();
+    }else if(el.webkitRequestFullscreen){
+      await el.webkitRequestFullscreen();
+    }
+  }catch(e){}
+}
+
 function startRace(){
   show('race');
 
@@ -472,8 +488,12 @@ function showResult(){
 }
 
 /* ===== nav ===== */
-document.getElementById('startBtn').onclick=startRace;
-window.addEventListener('resize',()=>{
+document.getElementById('startBtn').onclick = async () => {
+  await enterFullscreen();
+  startRace();
+};
+  
+  window.addEventListener('resize',()=>{
   /* 모바일 주소창/회전으로 뷰포트가 바뀔 때 다음 경주 레이아웃이 깨지지 않도록 현재 레이스 화면만 재배치 */
   if(S.race.classList.contains('on') && !running){
     requestAnimationFrame(buildLanes);
