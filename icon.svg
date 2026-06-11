@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="KOEN 코냥이 경주 아이콘">
+  <rect width="512" height="512" rx="108" fill="#bfe9ff"/>
+  <rect x="18" y="18" width="476" height="476" rx="92" fill="none" stroke="#16365c" stroke-width="18"/>
+  <g opacity=".85" fill="#fff">
+    <rect x="78" y="116" width="88" height="22"/>
+    <rect x="100" y="94" width="44" height="22"/>
+    <rect x="328" y="112" width="72" height="18"/>
+    <rect x="346" y="94" width="36" height="18"/>
+    <rect x="72" y="362" width="64" height="18"/>
+    <rect x="88" y="344" width="32" height="18"/>
+  </g>
+  <g transform="translate(72 150) scale(1.12)" shape-rendering="crispEdges">
+    <path d="M42 170h186l76 56H118L42 170z" fill="#1e8fd8" stroke="#16365c" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M64 96c0-42 34-76 76-76h58c46 0 86 33 94 78l9 49H90c-14 0-26-12-26-26V96z" fill="#72cdf6" stroke="#16365c" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M268 124l94-38 20 44-96 42z" fill="#72cdf6" stroke="#16365c" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M92 180l-54 50 116-12z" fill="#72cdf6" stroke="#16365c" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M178 36l44-28 42 82h-78z" fill="#72cdf6" stroke="#16365c" stroke-width="14" stroke-linejoin="round"/>
+    <circle cx="122" cy="98" r="38" fill="#fdfdf4" stroke="#16365c" stroke-width="12"/>
+    <circle cx="122" cy="98" r="16" fill="#16365c"/>
+    <circle cx="208" cy="106" r="24" fill="#fdfdf4" stroke="#16365c" stroke-width="10"/>
+    <circle cx="208" cy="106" r="9" fill="#16365c"/>
+    <rect x="264" y="177" width="68" height="32" rx="8" fill="#fdfdf4" stroke="#16365c" stroke-width="10"/>
+    <text x="276" y="199" font-family="monospace" font-size="20" font-weight="700" fill="#1e8fd8">KOEN</text>
+    <path d="M96 160h60M182 160h64" stroke="#fff" stroke-width="10" stroke-linecap="square"/>
+  </g>
+</svg>
