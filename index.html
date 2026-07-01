@@ -152,6 +152,18 @@
     font-size:90px;color:#fff;z-index:9;pointer-events:none;
     text-shadow:4px 4px 0 var(--ink),-3px -3px 0 var(--ink),3px -3px 0 var(--ink),-3px 3px 0 var(--ink);
   }
+  /* 실시간 순위표 */
+  #liveRank{
+    position:absolute;top:8px;left:8px;z-index:6;width:80px;
+    max-height:calc(100% - 90px);overflow-y:auto;
+    background:rgba(22,54,92,.85);border:3px solid var(--ink);
+    color:#fff;font-size:11px;padding:4px 5px;
+  }
+  #liveRank .lrTitle{text-align:center;letter-spacing:2px;margin-bottom:4px;color:var(--gold);}
+  .lrRow{display:flex;align-items:center;gap:4px;padding:1px 0;white-space:nowrap;}
+  .lrRow b{width:16px;text-align:right;flex:none;font-weight:normal;}
+  .lrRow .dot{width:9px;height:9px;flex:none;border:1px solid #fff;}
+  .lrRow.done{opacity:.5;}
 
   /* ---------- screen 3 : result ---------- */
   #result{justify-content:center;gap:16px;padding:16px 24px;}
@@ -227,6 +239,7 @@
       <div id="goal"></div>
       <div id="goalFlag"></div>
       <div id="lanes"></div>
+      <div id="liveRank"><div class="lrTitle">순위</div><div id="liveRankList"></div></div>
     </div>
     <div id="countdown"></div>
   </section>
@@ -326,7 +339,20 @@ renderSetup();
 
 /* ===== race engine ===== */
 const TOTAL=100;
-let racers=[], rafId=null, tickId=null, t0=0, finished=[], running=false;
+let racers=[], rafId=null, tickId=null, rankTickId=null, t0=0, finished=[], running=false;
+
+function updateLiveRank(){
+  const list=document.getElementById('liveRankList');
+  if(!list) return;
+  const unfinished=racers.filter(r=>!r.done).sort((a,b)=>b.pos-a.pos);
+  const ordered=finished.concat(unfinished);
+  list.innerHTML=ordered.map((r,idx)=>`
+    <div class="lrRow${r.done?' done':''}">
+      <b>${idx+1}</b>
+      <span class="dot" style="background:${r.def.css}"></span>
+      <span>${r.i+1}</span>
+    </div>`).join('');
+}
 
 function buildLanes(){
   const lanes=document.getElementById('lanes');
@@ -411,6 +437,9 @@ function beginLoop(){
       r.speed=Math.max(5,Math.min(15, r.speed+(Math.floor(Math.random()*7)-3)));
     });
   },1000);
+  /* 실시간 순위표 갱신 (매 프레임 정렬은 과하므로 주기적으로만) */
+  updateLiveRank();
+  rankTickId=setInterval(updateLiveRank,300);
 
   const wrap=document.getElementById('trackWrap');
   const goalX=wrap.clientWidth-34-13;     /* goal line position */
@@ -468,6 +497,8 @@ function beginLoop(){
     if(finished.length===racers.length){
       running=false;
       clearInterval(tickId);
+      clearInterval(rankTickId);
+      updateLiveRank();
       setTimeout(showResult,800);
       return;
     }
@@ -510,7 +541,7 @@ document.getElementById('startBtn').onclick = async () => {
   }
 });
 document.getElementById('againBtn').onclick=startRace;
-document.getElementById('homeBtn').onclick=()=>{cancelAnimationFrame(rafId);clearInterval(tickId);show('setup');};
+document.getElementById('homeBtn').onclick=()=>{cancelAnimationFrame(rafId);clearInterval(tickId);clearInterval(rankTickId);show('setup');};
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
