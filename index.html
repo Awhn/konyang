@@ -252,7 +252,7 @@ const BOOM = [
 ]; /* 0-2: explosion, 3: smoke */
 
 /* ===== palette : hue rotations from base blue (#1e8fd8 ≈ hue 205) ===== */
-const RACERS = [
+const BASE_RACERS = [
   {hue:0,   sat:1,   name:"파랑",  css:"#1e8fd8"},
   {hue:140, sat:1,   name:"분홍",  css:"#d84fae"},
   {hue:255, sat:1.1, name:"초록",  css:"#2fae4f"},
@@ -262,6 +262,13 @@ const RACERS = [
   {hue:355, sat:1.4, name:"노랑",  css:"#e3c01f"},
   {hue:60,  sat:1,   name:"하늘",  css:"#27b6c9"},
 ];
+/* MAX명까지 커버하도록 부족한 색상은 균등 분포 HSL로 자동 생성 */
+const RACERS = Array.from({length:64}, (_, i) => {
+  if(i < BASE_RACERS.length) return BASE_RACERS[i];
+  const hue=Math.round((i*360)/64);
+  const round=Math.floor(i/BASE_RACERS.length)+1;
+  return {hue, sat:1, name:`${BASE_RACERS[i%BASE_RACERS.length].name}${round}`, css:`hsl(${hue}, 70%, 50%)`};
+});
 const filterOf = r => `hue-rotate(${r.hue}deg) saturate(${r.sat})`;
 
 /* ===== clouds ===== */
@@ -288,7 +295,7 @@ const S={setup:setup, race:race, result:result};
 function show(id){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));S[id].classList.add('on');}
 
 /* ===== setup screen ===== */
-let n=4; const MIN=2, MAX=8;
+let n=4; const MIN=2, MAX=64;
 document.getElementById('heroImg').src=SPRITE;
 const countBox=document.getElementById('countBox');
 const mini=document.getElementById('miniPreview');
