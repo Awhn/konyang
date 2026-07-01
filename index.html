@@ -152,6 +152,18 @@
     font-size:90px;color:#fff;z-index:9;pointer-events:none;
     text-shadow:4px 4px 0 var(--ink),-3px -3px 0 var(--ink),3px -3px 0 var(--ink),-3px 3px 0 var(--ink);
   }
+  /* 실시간 순위표 */
+  #liveRank{
+    position:absolute;top:8px;left:8px;z-index:6;width:80px;
+    max-height:calc(100% - 90px);overflow-y:auto;
+    background:rgba(22,54,92,.85);border:3px solid var(--ink);
+    color:#fff;font-size:11px;padding:4px 5px;
+  }
+  #liveRank .lrTitle{text-align:center;letter-spacing:2px;margin-bottom:4px;color:var(--gold);}
+  .lrRow{display:flex;align-items:center;gap:4px;padding:1px 0;white-space:nowrap;}
+  .lrRow b{width:16px;text-align:right;flex:none;font-weight:normal;}
+  .lrRow .dot{width:9px;height:9px;flex:none;border:1px solid #fff;}
+  .lrRow.done{opacity:.5;}
 
   /* ---------- screen 3 : result ---------- */
   #result{justify-content:center;gap:16px;padding:16px 24px;}
@@ -227,6 +239,7 @@
       <div id="goal"></div>
       <div id="goalFlag"></div>
       <div id="lanes"></div>
+      <div id="liveRank"><div class="lrTitle">순위</div><div id="liveRankList"></div></div>
     </div>
     <div id="countdown"></div>
   </section>
@@ -252,7 +265,7 @@ const BOOM = [
 ]; /* 0-2: explosion, 3: smoke */
 
 /* ===== palette : hue rotations from base blue (#1e8fd8 ≈ hue 205) ===== */
-const RACERS = [
+const BASE_RACERS = [
   {hue:0,   sat:1,   name:"파랑",  css:"#1e8fd8"},
   {hue:140, sat:1,   name:"분홍",  css:"#d84fae"},
   {hue:255, sat:1.1, name:"초록",  css:"#2fae4f"},
@@ -262,6 +275,13 @@ const RACERS = [
   {hue:355, sat:1.4, name:"노랑",  css:"#e3c01f"},
   {hue:60,  sat:1,   name:"하늘",  css:"#27b6c9"},
 ];
+/* MAX명까지 커버하도록 부족한 색상은 균등 분포 HSL로 자동 생성 */
+const RACERS = Array.from({length:64}, (_, i) => {
+  if(i < BASE_RACERS.length) return BASE_RACERS[i];
+  const hue=Math.round((i*360)/64);
+  const round=Math.floor(i/BASE_RACERS.length)+1;
+  return {hue, sat:1, name:`${BASE_RACERS[i%BASE_RACERS.length].name}${round}`, css:`hsl(${hue}, 70%, 50%)`};
+});
 const filterOf = r => `hue-rotate(${r.hue}deg) saturate(${r.sat})`;
 
 /* ===== clouds ===== */
@@ -288,7 +308,7 @@ const S={setup:setup, race:race, result:result};
 function show(id){document.querySelectorAll('.screen').forEach(e=>e.classList.remove('on'));S[id].classList.add('on');}
 
 /* ===== setup screen ===== */
-let n=4; const MIN=2, MAX=8;
+let n=4; const MIN=2, MAX=64;
 document.getElementById('heroImg').src=SPRITE;
 const countBox=document.getElementById('countBox');
 const mini=document.getElementById('miniPreview');
@@ -319,7 +339,20 @@ renderSetup();
 
 /* ===== race engine ===== */
 const TOTAL=100;
-let racers=[], rafId=null, tickId=null, t0=0, finished=[], running=false;
+let racers=[], rafId=null, tickId=null, rankTickId=null, t0=0, finished=[], running=false;
+
+function updateLiveRank(){
+  const list=document.getElementById('liveRankList');
+  if(!list) return;
+  const unfinished=racers.filter(r=>!r.done).sort((a,b)=>b.pos-a.pos);
+  const ordered=finished.concat(unfinished);
+  list.innerHTML=ordered.map((r,idx)=>`
+    <div class="lrRow${r.done?' done':''}">
+      <b>${idx+1}</b>
+      <span class="dot" style="background:${r.def.css}"></span>
+      <span>${r.i+1}</span>
+    </div>`).join('');
+}
 
 function buildLanes(){
   const lanes=document.getElementById('lanes');
@@ -404,6 +437,9 @@ function beginLoop(){
       r.speed=Math.max(5,Math.min(15, r.speed+(Math.floor(Math.random()*7)-3)));
     });
   },1000);
+  /* 실시간 순위표 갱신 (매 프레임 정렬은 과하므로 주기적으로만) */
+  updateLiveRank();
+  rankTickId=setInterval(updateLiveRank,300);
 
   const wrap=document.getElementById('trackWrap');
   const goalX=wrap.clientWidth-34-13;     /* goal line position */
@@ -461,6 +497,8 @@ function beginLoop(){
     if(finished.length===racers.length){
       running=false;
       clearInterval(tickId);
+      clearInterval(rankTickId);
+      updateLiveRank();
       setTimeout(showResult,800);
       return;
     }
@@ -503,7 +541,7 @@ document.getElementById('startBtn').onclick = async () => {
   }
 });
 document.getElementById('againBtn').onclick=startRace;
-document.getElementById('homeBtn').onclick=()=>{cancelAnimationFrame(rafId);clearInterval(tickId);show('setup');};
+document.getElementById('homeBtn').onclick=()=>{cancelAnimationFrame(rafId);clearInterval(tickId);clearInterval(rankTickId);show('setup');};
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
